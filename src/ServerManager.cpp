@@ -2,7 +2,6 @@
 #include "Globals.h"
 #include <WebServer.h>
 #include <esp-fs-webserver.h>
-#include "htmls.h"
 #include <Update.h>
 #include <ESPmDNS.h>
 #include <LittleFS.h>
@@ -37,7 +36,6 @@ void logHandler() {
 #include "Globals.h"
 #include <WebServer.h>
 #include <esp-fs-webserver.h>
-#include "htmls.h"
 #include <Update.h>
 #include <ESPmDNS.h>
 #include <LittleFS.h>
