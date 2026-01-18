@@ -17,20 +17,6 @@
 
 
 // ...existing code...
-WiFiUDP udp;
-
-unsigned int localUdpPort = 4210;
-char incomingPacket[255];
-
-// Pufferdefinition
-#define BUFFER_SIZE 64
-char dataBuffer[BUFFER_SIZE];
-int bufferIndex = 0;
-
-// Aktueller verbundener Client
-WiFiClient currentClient = WiFiClient();
-WebServer server(80);
-FSWebServer mws(LittleFS, server);
 
 // Log buffer and handler must be after mws
 #define LOG_BUFFER_SIZE 2048
