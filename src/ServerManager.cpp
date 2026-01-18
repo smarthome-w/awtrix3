@@ -1,3 +1,4 @@
+#include "htmls.h"
 #include "ServerManager.h"
 #include "Globals.h"
 #include <WebServer.h>
@@ -18,6 +19,17 @@
 
 // ...existing code...
 
+// ...existing code...
+WiFiUDP udp;
+unsigned int localUdpPort = 4210;
+char incomingPacket[255];
+#define BUFFER_SIZE 64
+char dataBuffer[BUFFER_SIZE];
+int bufferIndex = 0;
+WiFiClient currentClient = WiFiClient();
+WebServer server(80);
+FSWebServer mws(LittleFS, server);
+
 // Log buffer and handler must be after mws
 #define LOG_BUFFER_SIZE 2048
 String logBuffer = "";
@@ -36,37 +48,6 @@ void logHandler() {
     interrupts();
     webRequest->send(200, F("text/plain"), logs);
 }
-#include "ServerManager.h"
-#include "Globals.h"
-#include <WebServer.h>
-#include <esp-fs-webserver.h>
-#include <Update.h>
-#include <ESPmDNS.h>
-#include <LittleFS.h>
-#include <WiFi.h>
-#include "DisplayManager.h"
-#include "UpdateManager.h"
-#include "PeripheryManager.h"
-#include "PowerManager.h"
-#include <WiFiUdp.h>
-#include <HTTPClient.h>
-#include "Games/GameManager.h"
-#include <EEPROM.h>
-
-WiFiUDP udp;
-
-unsigned int localUdpPort = 4210;
-char incomingPacket[255];
-
-// Pufferdefinition
-#define BUFFER_SIZE 64
-char dataBuffer[BUFFER_SIZE];
-int bufferIndex = 0;
-
-// Aktueller verbundener Client
-WiFiClient currentClient = WiFiClient();
-WebServer server(80);
-FSWebServer mws(LittleFS, server);
 
 // Erstelle eine Server-Instanz
 WiFiServer TCPserver(8080);
