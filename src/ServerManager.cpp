@@ -1,3 +1,22 @@
+#define LOG_BUFFER_SIZE 2048
+#include <vector>
+#include <mutex>
+String logBuffer = "";
+std::mutex logMutex;
+
+void appendLog(const String& msg) {
+    std::lock_guard<std::mutex> lock(logMutex);
+    logBuffer += msg + "\n";
+    if (logBuffer.length() > LOG_BUFFER_SIZE) {
+        logBuffer = logBuffer.substring(logBuffer.length() - LOG_BUFFER_SIZE);
+    }
+}
+
+void logHandler() {
+    WebServerClass *webRequest = mws.getRequest();
+    std::lock_guard<std::mutex> lock(logMutex);
+    webRequest->send(200, F("text/plain"), logBuffer);
+}
 #include "ServerManager.h"
 #include "Globals.h"
 #include <WebServer.h>
@@ -70,6 +89,7 @@ void saveHandler()
 }
 
 void addHandler()
+    mws.addHandler("/api/logs", HTTP_GET, logHandler);
 {
 
     mws.addHandler("/api/power", HTTP_POST, []()
@@ -280,6 +300,27 @@ void ServerManager_::setup()
 void ServerManager_::tick()
 {
     mws.run();
+
+    // WiFi stability check and auto-reconnect
+    static unsigned long lastWiFiCheck = 0;
+    unsigned long now = millis();
+    if (now - lastWiFiCheck > 5000) { // check every 5 seconds
+        lastWiFiCheck = now;
+        if (WiFi.status() != WL_CONNECTED) {
+            String msg = "WiFi disconnected, attempting reconnect...";
+            DEBUG_PRINTLN(msg);
+            appendLog(msg);
+            WiFi.disconnect();
+            delay(100);
+            WiFi.reconnect();
+        } else {
+            int32_t rssi = WiFi.RSSI();
+            char buf[64];
+            snprintf(buf, sizeof(buf), "WiFi RSSI: %d dBm", rssi);
+            DEBUG_PRINTLN(buf);
+            appendLog(buf);
+        }
+    }
 
     if (!AP_MODE)
     {
