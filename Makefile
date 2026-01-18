@@ -16,7 +16,7 @@ prepare:
 .PHONY: build upload upload_ip
 
 # PlatformIO command
-PIO = platformio
+PIO = ./.venv/bin/platformio
 
 build:
 	$(PIO) run
