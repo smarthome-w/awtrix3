@@ -30,6 +30,7 @@ WiFiClient currentClient = WiFiClient();
 WebServer server(80);
 FSWebServer mws(LittleFS, server);
 
+
 // Log buffer and handler must be after mws
 #define LOG_BUFFER_SIZE 2048
 String logBuffer = "";
