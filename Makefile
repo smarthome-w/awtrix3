@@ -1,4 +1,4 @@
-.PHONY: build upload upload_ip prepare
+.PHONY: build upload upload_ip prepare clean activate
 VENV_DIR = .venv
 
 prepare:
@@ -7,11 +7,15 @@ prepare:
 	@echo "Activating virtualenv and installing requirements..."
 	. $(VENV_DIR)/bin/activate && pip install -U pip && pip install -r requirements.txt
 	@echo "PlatformIO installation complete. Activate with: . $(VENV_DIR)/bin/activate"
-# Makefile for AWTRIX3 PlatformIO project
-# Usage:
-#   make build        - Build the firmware
-#   make upload       - Upload via serial (default PlatformIO method)
-#   make upload_ip IP=192.168.1.123  - Upload via OTA to device at IP
+
+activate:
+	@if [ ! -d $(VENV_DIR) ]; then \
+		echo "Virtualenv not found. Run 'make prepare' first."; \
+		exit 1; \
+	fi
+
+clean:
+	rm -rf .pio build .venv __pycache__
 
 .PHONY: build upload upload_ip
 
