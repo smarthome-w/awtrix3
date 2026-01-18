@@ -1,21 +1,37 @@
-#define LOG_BUFFER_SIZE 2048
-#include <vector>
-#include <mutex>
-String logBuffer = "";
-std::mutex logMutex;
+#include "ServerManager.h"
+#include "Globals.h"
+#include <WebServer.h>
+#include <esp-fs-webserver.h>
+#include "htmls.h"
+#include <Update.h>
+#include <ESPmDNS.h>
+#include <LittleFS.h>
+#include <WiFi.h>
+#include "DisplayManager.h"
+#include "UpdateManager.h"
+#include "PeripheryManager.h"
+#include "PowerManager.h"
+#include <WiFiUdp.h>
+#include <HTTPClient.h>
+#include "Games/GameManager.h"
+#include <EEPROM.h>
 
+#define LOG_BUFFER_SIZE 2048
+String logBuffer = "";
 void appendLog(const String& msg) {
-    std::lock_guard<std::mutex> lock(logMutex);
+    noInterrupts();
     logBuffer += msg + "\n";
     if (logBuffer.length() > LOG_BUFFER_SIZE) {
         logBuffer = logBuffer.substring(logBuffer.length() - LOG_BUFFER_SIZE);
     }
+    interrupts();
 }
-
 void logHandler() {
     WebServerClass *webRequest = mws.getRequest();
-    std::lock_guard<std::mutex> lock(logMutex);
-    webRequest->send(200, F("text/plain"), logBuffer);
+    noInterrupts();
+    String logs = logBuffer;
+    interrupts();
+    webRequest->send(200, F("text/plain"), logs);
 }
 #include "ServerManager.h"
 #include "Globals.h"
@@ -89,9 +105,8 @@ void saveHandler()
 }
 
 void addHandler()
-    mws.addHandler("/api/logs", HTTP_GET, logHandler);
 {
-
+    mws.addHandler("/api/logs", HTTP_GET, logHandler);
     mws.addHandler("/api/power", HTTP_POST, []()
                    { DisplayManager.powerStateParse(mws.webserver->arg("plain").c_str()); mws.webserver->send(200,F("text/plain"),F("OK")); });
     mws.addHandler(
